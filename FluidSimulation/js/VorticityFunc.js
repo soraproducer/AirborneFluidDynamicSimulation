@@ -1,6 +1,6 @@
 /*global THREE:true*/
-/*global Advect:true*/
-Advect = function(res, camera) {
+/*global VorticityFunc:true*/
+VorticityFunc = function(res, camera) {
     this.res = res;
     this.camera = camera;
 
@@ -8,14 +8,17 @@ Advect = function(res, camera) {
 
     this.uniforms = {
         res: {value: new THREE.Vector2()},
-        velocityField: {value: new THREE.Texture()},
-        advectionField: {value: new THREE.Texture()},
-        dissipation: {value: 1.0},
-        dt:{value: 1.0}
+        velocity: {value: new THREE.Texture()},
+        curl: {value: new THREE.Texture()},
+        weight: {value: 0.1},
+        threshold: {value: 0.01},
+        dx: {value: 1.0},
+        dy: {value: 1.0},
+        dt: {value: 1.0}
     };
     var material = new THREE.ShaderMaterial({
         uniforms: this.uniforms,
-        fragmentShader: document.getElementById( 'Advect' ).innerHTML
+        fragmentShader: document.getElementById( 'VorticityFunc' ).innerHTML
     });
 
     this.mesh = new THREE.Mesh(geometry, material);
@@ -24,11 +27,11 @@ Advect = function(res, camera) {
 }
 
 
-Advect.prototype.process = function(renderer, velocityField, advectionField, dissipation, dt, output){
+VorticityFunc.prototype.process = function(renderer, velocity, curl, weight, dt, output){
     this.uniforms.res.value = this.res;
-    this.uniforms.velocityField.value = velocityField;
-    this.uniforms.advectionField.value = advectionField;
-    this.uniforms.dissipation.value = dissipation;
+    this.uniforms.velocity.value = velocity;
+    this.uniforms.curl.value = curl;
+    this.uniforms.weight.value = weight;
     this.uniforms.dt.value = dt;
     renderer.setRenderTarget(output);
     renderer.clear(false);

@@ -1,6 +1,6 @@
 /*global THREE:true*/
-/*global Advect:true*/
-Advect = function(res, camera) {
+/*global Curl:true*/
+Curl = function(res, camera) {
     this.res = res;
     this.camera = camera;
 
@@ -8,14 +8,13 @@ Advect = function(res, camera) {
 
     this.uniforms = {
         res: {value: new THREE.Vector2()},
-        velocityField: {value: new THREE.Texture()},
-        advectionField: {value: new THREE.Texture()},
-        dissipation: {value: 1.0},
-        dt:{value: 1.0}
+        u: {value: new THREE.Texture()},
+        dx: {value: 1.0},
+        dy: {value: 1.0}
     };
     var material = new THREE.ShaderMaterial({
         uniforms: this.uniforms,
-        fragmentShader: document.getElementById( 'Advect' ).innerHTML
+        fragmentShader: document.getElementById( 'Curl' ).innerHTML
     });
 
     this.mesh = new THREE.Mesh(geometry, material);
@@ -24,12 +23,9 @@ Advect = function(res, camera) {
 }
 
 
-Advect.prototype.process = function(renderer, velocityField, advectionField, dissipation, dt, output){
+Curl.prototype.process = function(renderer, u, output){
     this.uniforms.res.value = this.res;
-    this.uniforms.velocityField.value = velocityField;
-    this.uniforms.advectionField.value = advectionField;
-    this.uniforms.dissipation.value = dissipation;
-    this.uniforms.dt.value = dt;
+    this.uniforms.u.value = u;
     renderer.setRenderTarget(output);
     renderer.clear(false);
     renderer.render(this.scene, this.camera);
